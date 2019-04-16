@@ -28,6 +28,7 @@
 @interface CDVKeyboard () <UIScrollViewDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL keyboardIsVisible;
+@property (readwrite, assign) CGFloat keyboardHeight;
 
 @end
 
@@ -197,6 +198,9 @@ static IMP WKOriginalImp;
     if (CGRectContainsRect(screen, keyboardIntersection) && !CGRectIsEmpty(keyboardIntersection) && _shrinkView && self.keyboardIsVisible) {
         screen.size.height -= keyboardIntersection.size.height;
         self.webView.scrollView.scrollEnabled = !self.disableScrollingInShrinkView;
+        if (@available(iOS 12, *)) {
+            self.keyboardHeight = screen.size.height;
+        }
     }
 
     // A view's frame is in its superview's coordinate system so we need to convert again
@@ -207,12 +211,21 @@ static IMP WKOriginalImp;
 
 - (void)scrollViewDidScroll:(UIScrollView*)scrollView
 {
+
     if (_shrinkView && _keyboardIsVisible) {
-        CGFloat maxY = scrollView.contentSize.height - scrollView.bounds.size.height;
-        if (scrollView.bounds.origin.y > maxY) {
-            scrollView.bounds = CGRectMake(scrollView.bounds.origin.x, maxY,
-                                           scrollView.bounds.size.width, scrollView.bounds.size.height);
+        if (@available(iOS 12, *)) { 
+            CGPoint bottomOffset = CGPointMake(0.0f, 0.0f);
+            [self.webView.scrollView setContentOffset:bottomOffset animated:NO];
+        } else {
+            CGFloat maxY = scrollView.contentSize.height - scrollView.bounds.size.height;
+            if (scrollView.bounds.origin.y > maxY) {
+                scrollView.bounds = CGRectMake(scrollView.bounds.origin.x, maxY,
+                                               scrollView.bounds.size.width, scrollView.bounds.size.height);
+            }
+
         }
+
+
     }
 }
 
