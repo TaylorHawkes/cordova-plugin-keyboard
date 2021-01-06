@@ -100,6 +100,10 @@ Keyboard.hide = function() {
     exec(null, null, "Keyboard", "hide", []);
 };
 
+Keyboard.close = function() {
+    exec(null, null, "Keyboard", "hide", []);
+};
+
 Keyboard.isVisible = false;
 Keyboard.automaticScrollToTopOnHiding = false;
 
